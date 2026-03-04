@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+out/
+*.class
+*.jar
+*.war
+*.rar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Environment
+.env
+.env.local
+*.properties.local
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+logs/
