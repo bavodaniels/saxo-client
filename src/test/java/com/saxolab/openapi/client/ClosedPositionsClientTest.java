@@ -26,7 +26,8 @@ class ClosedPositionsClientTest {
     mockWebServer = new MockWebServer();
     mockWebServer.start();
 
-    RestClient restClient = TestRestClientFactory.createConfiguredRestClient(mockWebServer.url("/").toString());
+    String baseUrl = mockWebServer.url("/").toString();
+    RestClient restClient = TestRestClientFactory.createConfiguredRestClient(baseUrl);
 
     HttpServiceProxyFactory factory =
         HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build();
