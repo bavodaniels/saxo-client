@@ -2,8 +2,11 @@ plugins {
     java
     `java-library`
     `maven-publish`
+    checkstyle
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
+    id("com.diffplug.spotless") version "6.25.0"
+    id("org.owasp.dependencycheck") version "9.0.7"
 }
 
 group = "com.saxolab"
@@ -13,6 +16,25 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+spotless {
+    java {
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat("1.35.0")
+    }
+}
+
+checkstyle {
+    toolVersion = "10.12.7"
+    configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+dependencyCheck {
+    format = "ALL"
+    suppressionFile = "config/dependencycheck-suppressions.xml"
+}
+
 
 repositories {
     mavenCentral()
@@ -48,9 +70,20 @@ tasks.named<Jar>("jar") {
 }
 
 publishing {
+    repositories {
+        mavenLocal()
+    }
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+            }
         }
     }
 }
