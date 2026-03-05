@@ -9,5 +9,5 @@ public record Account(
     String ClientKey,
     String AccountType,
     String Currency,
-    boolean Active,
+    Boolean Active,
     String DisplayName) {}
