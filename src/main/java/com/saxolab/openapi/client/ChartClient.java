@@ -8,10 +8,10 @@ import org.springframework.web.service.annotation.HttpExchange;
 @HttpExchange("/chart/v1")
 public interface ChartClient {
 
-    @GetExchange("/charts")
-    ChartData getChartData(
-            @RequestParam int Uic,
-            @RequestParam String AssetType,
-            @RequestParam int Horizon,
-            @RequestParam int Count);
+  @GetExchange("/charts")
+  ChartData getChartData(
+      @RequestParam(name = "Uic") int uic,
+      @RequestParam(name = "AssetType") String assetType,
+      @RequestParam(name = "Horizon") int horizon,
+      @RequestParam(name = "Count") int count);
 }

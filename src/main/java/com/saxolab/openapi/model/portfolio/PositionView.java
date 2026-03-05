@@ -4,7 +4,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PositionView(
-        Double CurrentPrice,
-        Double ProfitLossOnTrade,
-        String ConversionRateCurrent
-) {}
+    Double CurrentPrice, Double ProfitLossOnTrade, String ConversionRateCurrent) {}

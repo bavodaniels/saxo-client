@@ -4,13 +4,13 @@ import java.time.Instant;
 
 public interface SaxoOAuthTokenStore {
 
-    void storeTokens(String accessToken, String refreshToken, Instant expiresAt);
+  void storeTokens(String accessToken, String refreshToken, Instant expiresAt);
 
-    String getAccessToken();
+  String getAccessToken();
 
-    String getRefreshToken();
+  String getRefreshToken();
 
-    Instant getExpiresAt();
+  Instant getExpiresAt();
 
-    boolean hasTokens();
+  boolean hasTokens();
 }

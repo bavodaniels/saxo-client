@@ -1,6 +1,9 @@
 package com.saxolab.openapi.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.saxolab.openapi.model.portfolio.AccountList;
+import java.io.IOException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -11,104 +14,103 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class PortfolioClientTest {
 
-    private MockWebServer mockWebServer;
-    private PortfolioClient portfolioClient;
+  private MockWebServer mockWebServer;
+  private PortfolioClient portfolioClient;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
+  @BeforeEach
+  void setUp() throws IOException {
+    mockWebServer = new MockWebServer();
+    mockWebServer.start();
 
-        RestClient restClient = RestClient.builder()
-                .baseUrl(mockWebServer.url("/").toString())
-                .build();
+    RestClient restClient = RestClient.builder().baseUrl(mockWebServer.url("/").toString()).build();
 
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(RestClientAdapter.create(restClient))
-                .build();
+    HttpServiceProxyFactory factory =
+        HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build();
 
-        portfolioClient = factory.createClient(PortfolioClient.class);
-    }
+    portfolioClient = factory.createClient(PortfolioClient.class);
+  }
 
-    @AfterEach
-    void tearDown() throws IOException {
-        mockWebServer.shutdown();
-    }
+  @AfterEach
+  void tearDown() throws IOException {
+    mockWebServer.shutdown();
+  }
 
-    @Test
-    void getAccounts_deserializesJsonResponse() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-                .setHeader("Content-Type", "application/json")
-                .setBody("""
-                        {
-                          "Data": [
-                            {
-                              "AccountId": "123",
-                              "AccountKey": "key-1",
-                              "ClientKey": "client-1",
-                              "AccountType": "Normal",
-                              "Currency": "USD",
-                              "Active": true,
-                              "DisplayName": "My Account"
-                            }
-                          ]
-                        }
-                        """));
+  @Test
+  void getAccounts_deserializesJsonResponse() throws Exception {
+    mockWebServer.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "application/json")
+            .setBody(
+                """
+        {
+          "Data": [
+            {
+              "AccountId": "123",
+              "AccountKey": "key-1",
+              "ClientKey": "client-1",
+              "AccountType": "Normal",
+              "Currency": "USD",
+              "Active": true,
+              "DisplayName": "My Account"
+            }
+          ]
+        }
+        """));
 
-        AccountList result = portfolioClient.getAccounts();
+    AccountList result = portfolioClient.getAccounts();
 
-        assertThat(result.Data()).hasSize(1);
-        assertThat(result.Data().get(0).AccountId()).isEqualTo("123");
-        assertThat(result.Data().get(0).Currency()).isEqualTo("USD");
-        assertThat(result.Data().get(0).Active()).isTrue();
+    assertThat(result.Data()).hasSize(1);
+    assertThat(result.Data().get(0).AccountId()).isEqualTo("123");
+    assertThat(result.Data().get(0).Currency()).isEqualTo("USD");
+    assertThat(result.Data().get(0).Active()).isTrue();
 
-        RecordedRequest request = mockWebServer.takeRequest();
-        assertThat(request.getPath()).isEqualTo("/port/v1/accounts/me");
-        assertThat(request.getMethod()).isEqualTo("GET");
-    }
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getPath()).isEqualTo("/port/v1/accounts/me");
+    assertThat(request.getMethod()).isEqualTo("GET");
+  }
 
-    @Test
-    void getAccounts_handlesEmptyDataArray() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-                .setHeader("Content-Type", "application/json")
-                .setBody("""
-                        { "Data": [] }
-                        """));
+  @Test
+  void getAccounts_handlesEmptyDataArray() throws Exception {
+    mockWebServer.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "application/json")
+            .setBody(
+                """
+        { "Data": [] }
+        """));
 
-        AccountList result = portfolioClient.getAccounts();
-        assertThat(result.Data()).isEmpty();
-    }
+    AccountList result = portfolioClient.getAccounts();
+    assertThat(result.Data()).isEmpty();
+  }
 
-    @Test
-    void getAccounts_ignoresUnknownJsonFields() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-                .setHeader("Content-Type", "application/json")
-                .setBody("""
-                        {
-                          "Data": [
-                            {
-                              "AccountId": "1",
-                              "AccountKey": "k",
-                              "ClientKey": "c",
-                              "AccountType": "Normal",
-                              "Currency": "EUR",
-                              "Active": false,
-                              "DisplayName": "Test",
-                              "SomeUnknownField": "value"
-                            }
-                          ],
-                          "AnotherUnknown": true
-                        }
-                        """));
+  @Test
+  void getAccounts_ignoresUnknownJsonFields() throws Exception {
+    mockWebServer.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "application/json")
+            .setBody(
+                """
+        {
+          "Data": [
+            {
+              "AccountId": "1",
+              "AccountKey": "k",
+              "ClientKey": "c",
+              "AccountType": "Normal",
+              "Currency": "EUR",
+              "Active": false,
+              "DisplayName": "Test",
+              "SomeUnknownField": "value"
+            }
+          ],
+          "AnotherUnknown": true
+        }
+        """));
 
-        AccountList result = portfolioClient.getAccounts();
-        assertThat(result.Data()).hasSize(1);
-        assertThat(result.Data().get(0).AccountId()).isEqualTo("1");
-    }
+    AccountList result = portfolioClient.getAccounts();
+    assertThat(result.Data()).hasSize(1);
+    assertThat(result.Data().get(0).AccountId()).isEqualTo("1");
+  }
 }

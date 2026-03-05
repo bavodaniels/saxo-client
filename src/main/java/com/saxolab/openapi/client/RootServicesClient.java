@@ -9,12 +9,12 @@ import org.springframework.web.service.annotation.PutExchange;
 @HttpExchange("/root/v1")
 public interface RootServicesClient {
 
-    @GetExchange("/sessions/capabilities")
-    Session getSessionCapabilities();
+  @GetExchange("/sessions/capabilities")
+  Session getSessionCapabilities();
 
-    @GetExchange("/user")
-    User getUser();
+  @GetExchange("/user")
+  User getUser();
 
-    @PutExchange("/sessions/capabilities")
-    void changeSessionCapabilities();
+  @PutExchange("/sessions/capabilities")
+  void changeSessionCapabilities();
 }

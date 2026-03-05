@@ -2,7 +2,7 @@ package com.saxolab.openapi.auth;
 
 public interface SaxoTokenProvider {
 
-    String getAccessToken();
+  String getAccessToken();
 
-    boolean isTokenValid();
+  boolean isTokenValid();
 }
