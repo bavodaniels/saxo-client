@@ -155,4 +155,54 @@ class AccountDiscoveryServiceTest {
 
     assertThat(accounts).hasSize(1).containsExactly(account);
   }
+
+  @Test
+  void discoverAccountKey_findsFirstActiveAccountInLargeList() {
+    List<Account> accounts = new java.util.ArrayList<>();
+    for (int i = 1; i <= 10; i++) {
+      accounts.add(
+          new Account(
+              "ID-" + i,
+              "KEY-" + i,
+              "CLIENT-" + i,
+              "TYPE",
+              "USD",
+              i % 3 != 0, // Some inactive
+              "Account " + i));
+    }
+    AccountList accountList = new AccountList(accounts);
+
+    when(portfolioClient.getAccounts()).thenReturn(accountList);
+
+    String accountKey = service.discoverAccountKey();
+
+    assertThat(accountKey).isEqualTo("KEY-1");
+  }
+
+  @Test
+  void getAllAccounts_returnsMultipleAccounts() {
+    Account account1 = new Account("ID-1", "KEY-1", "CLIENT-1", "TYPE", "USD", true, "Acc 1");
+    Account account2 = new Account("ID-2", "KEY-2", "CLIENT-2", "TYPE", "EUR", false, "Acc 2");
+    Account account3 = new Account("ID-3", "KEY-3", "CLIENT-3", "TYPE", "GBP", true, "Acc 3");
+    AccountList accountList = new AccountList(List.of(account1, account2, account3));
+
+    when(portfolioClient.getAccounts()).thenReturn(accountList);
+
+    List<Account> accounts = service.getAllAccounts();
+
+    assertThat(accounts).hasSize(3).containsExactly(account1, account2, account3);
+  }
+
+  @Test
+  void discoverAccountKey_withInactiveAccountReturnsFirst() {
+    Account inactiveAccount =
+        new Account("ID-1", "INACTIVE-KEY", "CLIENT-1", "TYPE", "USD", false, "Inactive");
+    AccountList accountList = new AccountList(List.of(inactiveAccount));
+
+    when(portfolioClient.getAccounts()).thenReturn(accountList);
+
+    String accountKey = service.discoverAccountKey();
+
+    assertThat(accountKey).isEqualTo("INACTIVE-KEY");
+  }
 }

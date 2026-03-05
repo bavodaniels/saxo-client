@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record InstrumentDetails(
-    int Uic,
+    Integer Uic,
     String AssetType,
     String Symbol,
     String Description,
@@ -12,4 +12,4 @@ public record InstrumentDetails(
     String ExchangeId,
     Double MinimumTradeSize,
     Double TickSize,
-    int OrderDistanceMinimum) {}
+    Integer OrderDistanceMinimum) {}

@@ -113,4 +113,44 @@ class PortfolioClientTest {
     assertThat(result.Data()).hasSize(1);
     assertThat(result.Data().get(0).AccountId()).isEqualTo("1");
   }
+
+  @Test
+  void getAccounts_deserializesMultipleAccounts() throws Exception {
+    mockWebServer.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "application/json")
+            .setBody(
+                """
+        {
+          "Data": [
+            {
+              "AccountId": "1",
+              "AccountKey": "k1",
+              "ClientKey": "c1",
+              "AccountType": "Type1",
+              "Currency": "USD",
+              "Active": true,
+              "DisplayName": "Account 1"
+            },
+            {
+              "AccountId": "2",
+              "AccountKey": "k2",
+              "ClientKey": "c2",
+              "AccountType": "Type2",
+              "Currency": "EUR",
+              "Active": false,
+              "DisplayName": "Account 2"
+            }
+          ]
+        }
+        """));
+
+    AccountList result = portfolioClient.getAccounts();
+
+    assertThat(result.Data()).hasSize(2);
+    assertThat(result.Data().get(0).Currency()).isEqualTo("USD");
+    assertThat(result.Data().get(1).Currency()).isEqualTo("EUR");
+    assertThat(result.Data().get(0).Active()).isTrue();
+    assertThat(result.Data().get(1).Active()).isFalse();
+  }
 }

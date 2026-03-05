@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record Order(
     String OrderId,
     String AccountKey,
-    int Uic,
+    Integer Uic,
     String AssetType,
     String BuySell,
     String OrderType,

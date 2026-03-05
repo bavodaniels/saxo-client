@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ClosedPositionBase(
-    int Uic,
+    Integer Uic,
     String AssetType,
     String BuySell,
     Double Amount,

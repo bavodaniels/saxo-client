@@ -4,10 +4,10 @@ plugins {
     `maven-publish`
     checkstyle
     jacoco
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
-    id("org.owasp.dependencycheck") version "9.0.7"
+    id("org.owasp.dependencycheck") version "9.1.0"
 }
 
 group = "com.saxolab"
@@ -27,7 +27,7 @@ spotless {
 }
 
 checkstyle {
-    toolVersion = "10.12.7"
+    toolVersion = "10.21.0"
     configFile = file("config/checkstyle/checkstyle.xml")
 }
 
@@ -37,7 +37,7 @@ dependencyCheck {
 }
 
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.13"
 }
 
 

@@ -4,4 +4,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PositionList(List<Position> Data, int Count) {}
+public record PositionList(List<Position> Data, Integer Count) {}

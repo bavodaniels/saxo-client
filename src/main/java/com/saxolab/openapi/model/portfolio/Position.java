@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record Position(
     String PositionId,
     String AccountKey,
-    int Uic,
+    Integer Uic,
     String AssetType,
     Double Amount,
     String Status,

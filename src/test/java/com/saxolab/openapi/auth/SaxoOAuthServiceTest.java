@@ -111,6 +111,75 @@ class SaxoOAuthServiceTest {
     assertThat(service.isTokenValid()).isTrue();
   }
 
+  @Test
+  void buildAuthorizeUrl_constructsUrlWithAllParameters() {
+    String authorizeUrl = service.buildAuthorizeUrl("test-state-123");
+
+    assertThat(authorizeUrl)
+        .contains(mockWebServer.url("/").toString())
+        .contains("/authorize")
+        .contains("client_id=key")
+        .contains("redirect_uri=https://localhost/cb")
+        .contains("response_type=code")
+        .contains("state=test-state-123");
+  }
+
+  @Test
+  void refreshTokenIfNeeded_handlesNullExpiresAt() {
+    tokenStore.storeTokens("access", "refresh", null);
+
+    service.refreshTokenIfNeeded();
+
+    assertThat(mockWebServer.getRequestCount()).isZero();
+  }
+
+  @Test
+  void getAccessToken_returnsNullWhenNoTokens() {
+    assertThat(service.getAccessToken()).isNull();
+  }
+
+  @Test
+  void isTokenValid_returnsFalseWhenExpiresAtIsNull() {
+    tokenStore.storeTokens("access", "refresh", null);
+
+    assertThat(service.isTokenValid()).isFalse();
+  }
+
+  @Test
+  void buildAuthorizeUrl_withSpecialCharacters() {
+    String stateWithSpecialChars = "state-with-special_chars.123";
+    String url = service.buildAuthorizeUrl(stateWithSpecialChars);
+
+    assertThat(url).contains(stateWithSpecialChars);
+  }
+
+  @Test
+  void authenticateWithCode_storesTokensWithExpiryCalculated() {
+    mockWebServer.enqueue(tokenResponse("access-token", "refresh-token", 7200));
+
+    service.authenticateWithCode("code-123");
+
+    assertThat(service.getAccessToken()).isEqualTo("access-token");
+    Instant storedExpiresAt = tokenStore.getExpiresAt();
+    assertThat(storedExpiresAt).isNotNull();
+    // ExpiresAt should be roughly now + 7200 seconds
+    Instant expectedMin = Instant.now().plusSeconds(7190);
+    Instant expectedMax = Instant.now().plusSeconds(7210);
+    assertThat(storedExpiresAt).isBetween(expectedMin, expectedMax);
+  }
+
+  @Test
+  void refreshTokenIfNeeded_exactlyAtThreshold() {
+    // Token expires at threshold (now + 60 seconds, with 60 second margin)
+    tokenStore.storeTokens("access", "refresh", Instant.now().plusSeconds(60));
+    mockWebServer.enqueue(tokenResponse("new-access", "new-refresh", 3600));
+
+    service.refreshTokenIfNeeded();
+
+    // Should refresh because now.isAfter(threshold) when exactly at threshold
+    assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
+  }
+
   private static MockResponse tokenResponse(
       String accessToken, String refreshToken, int expiresIn) {
     return new MockResponse()
